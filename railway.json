@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "composer install && php artisan migrate --force"
+  },
+  "deploy": {
+    "startCommand": "php artisan serve --host=0.0.0.0 --port=$PORT",
+    "healthCheck": "/up",
+    "restartPolicyType": "on-failure",
+    "restartPolicyMaxRetries": 3
+  }
+}

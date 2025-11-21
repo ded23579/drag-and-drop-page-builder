@@ -1,0 +1,23 @@
+[phases.setup]
+dependsOn = ["install"]
+
+[phases.install]
+cmds = [
+    "curl -sS https://getcomposer.org/installer | php",
+    "php composer.phar install --no-dev --optimize-autoloader",
+    "php artisan config:cache"
+]
+
+[phases.build]
+cmds = [
+    "npm ci --production",
+    "npm run build --if-present"
+]
+
+[phases.start]
+cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+
+[variables]
+    PHP_VERSION = "8.2"
+    COMPOSER_VERSION = "2.7.7"
+    NODE_VERSION = "20.10.0"
