@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Plugin</title>
+</head>
+<body>
+    <h1>Test GrapeJS Font Plugin</h1>
+    <div id="output"></div>
+
+    <script>
+        // Simulasikan grapesjs object untuk testing
+        window.grapesjs = {
+            plugins: {
+                add: function(name, plugin) {
+                    try {
+                        // Mencoba membuat instance plugin
+                        const mockEditor = {
+                            StyleManager: {
+                                getSectors: function() { return { where: function() { return []; } }; }
+                            },
+                            Commands: {
+                                add: function() {}
+                            },
+                            Panels: {
+                                addButton: function() {},
+                                hasButton: function() { return false; },
+                                removeButton: function() {}
+                            },
+                            Canvas: {
+                                getDocument: function() {
+                                    return {
+                                        head: {
+                                            appendChild: function() {}
+                                        },
+                                        querySelector: function() { return null; }
+                                    };
+                                }
+                            },
+                            getSelected: function() { return null; }
+                        };
+                        
+                        // Inisialisasi plugin
+                        plugin.init(mockEditor, { allowCustomFonts: true });
+                        
+                        document.getElementById('output').innerHTML = '<p style="color: green;">Plugin loaded successfully!</p>';
+                    } catch (error) {
+                        document.getElementById('output').innerHTML = '<p style="color: red;">Error in plugin: ' + error.message + '</p>';
+                        console.error('Plugin error:', error);
+                    }
+                }
+            }
+        };
+
+        // Load the plugin code
+    </script>
+    
+    <script src="js/grapesjs-font-plugin.js"></script>
+</body>
+</html>

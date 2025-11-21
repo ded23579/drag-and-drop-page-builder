@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test GrapeJS Font Plugin</title>
+    <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 10px; font-family: Arial, sans-serif; }
+        #gjs { height: 80vh; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Test GrapeJS Font Plugin</h1>
+    <div id="gjs">
+        <div class="container">
+            <h1 style="font-family: Arial, sans-serif;">Contoh Teks dengan Font Arial</h1>
+            <p style="font-family: Roboto, sans-serif;">Ini adalah contoh paragraf dengan font Roboto.</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/grapesjs"></script>
+    <script src="js/grapesjs-font-plugin.js"></script>
+    <script>
+        const editor = grapesjs.init({
+            container: '#gjs',
+            height: '70vh',
+            storageManager: false,
+            fromElement: true,
+            plugins: [
+                'grapesjs-font-picker'
+            ],
+            pluginsOpts: {
+                'grapesjs-font-picker': {
+                    allowCustomFonts: true
+                }
+            },
+            canvas: {
+                styles: [
+                    'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap'
+                ]
+            },
+            styleManager: {
+                sectors: [{
+                    name: 'General',
+                    open: false,
+                    buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom']
+                }, {
+                    name: 'Dimension',
+                    open: false,
+                    buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding']
+                }, {
+                    name: 'Typography',
+                    open: false,
+                    buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration']
+                }, {
+                    name: 'Decorations',
+                    open: false,
+                    buildProps: ['border-radius-c', 'background-color', 'border', 'box-shadow']
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

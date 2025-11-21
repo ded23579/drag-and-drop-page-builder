@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contoh Penggunaan Plugin Font GrapeJS</title>
+    <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 10px; font-family: Arial, sans-serif; }
+        #gjs { height: 80vh; }
+    </style>
+</head>
+<body>
+    <div id="gjs">
+        <div class="container">
+            <h1 style="font-family: 'Arial', sans-serif;">Contoh Teks dengan Font Arial</h1>
+            <p style="font-family: 'Roboto', sans-serif;">Ini adalah contoh paragraf dengan font Roboto.</p>
+            <div class="text-center">
+                <button class="btn btn-primary">Contoh Tombol</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/grapesjs"></script>
+    <script src="js/grapesjs-font-plugin.js"></script>
+    <script>
+        const editor = grapesjs.init({
+            container: '#gjs',
+            height: '80vh',
+            storageManager: false,
+            plugins: [
+                'grapesjs-font-picker'
+            ],
+            pluginsOpts: {
+                'grapesjs-font-picker': {
+                    allowCustomFonts: true,
+                    allowGoogleFonts: true
+                }
+            },
+            canvas: {
+                styles: [
+                    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'
+                ],
+                scripts: [
+                    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
+                ]
+            },
+            styleManager: {
+                sectors: [{
+                    name: 'General',
+                    open: false,
+                    buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom']
+                }, {
+                    name: 'Dimension',
+                    open: false,
+                    buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding']
+                }, {
+                    name: 'Typography',
+                    open: false,
+                    buildProps: ['font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration']
+                    // Font family akan ditangani oleh plugin font picker
+                }, {
+                    name: 'Decorations',
+                    open: false,
+                    buildProps: ['border-radius-c', 'background-color', 'border', 'box-shadow']
+                }]
+            }
+        });
+
+        // Tambahkan tombol untuk menambah font kustom
+        editor.Commands.add('add-custom-font-btn', {
+            run(editor) {
+                const fontName = prompt('Masukkan nama font atau URL:');
+                if (fontName) {
+                    if (fontName.startsWith('http')) {
+                        // Ini adalah URL font
+                        const head = editor.Canvas.getDocument().head;
+                        const link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.href = fontName;
+                        head.appendChild(link);
+                        
+                        // Terapkan font ke elemen yang dipilih
+                        const selected = editor.getSelected();
+                        if (selected) {
+                            const fontValue = fontName.split('/').pop().split('.')[0].replace(/[^a-zA-Z0-9]/g, ' ');
+                            selected.addStyle({ 'font-family': `"${fontValue}"` });
+                        }
+                    } else {
+                        // Ini adalah nama font Google
+                        const fontNameFormatted = fontName.replace(' ', '+');
+                        const fontStyle = document.createElement('link');
+                        fontStyle.href = `https://fonts.googleapis.com/css2?family=${fontNameFormatted}:wght@300;400;500;600;700&display=swap`;
+                        fontStyle.rel = 'stylesheet';
+                        document.head.appendChild(fontStyle);
+                        
+                        // Terapkan font ke elemen yang dipilih
+                        const selected = editor.getSelected();
+                        if (selected) {
+                            selected.addStyle({ 'font-family': `"${fontName}", sans-serif` });
+                        }
+                    }
+                }
+            }
+        });
+
+        // Tambahkan tombol ke panel toolbar
+        const pn = editor.Panels;
+        pn.addButton('options', {
+            id: 'add-font-btn',
+            className: 'fa fa-font',
+            command: 'add-custom-font-btn',
+            attributes: { title: 'Tambah Font Custom' }
+        });
+    </script>
+</body>
+</html>
