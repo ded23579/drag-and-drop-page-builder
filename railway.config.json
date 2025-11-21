@@ -1,0 +1,19 @@
+{
+  "extends": ["php", "npm"],
+  "builds": [
+    {
+      "name": "php",
+      "path": "."
+    }
+  ],
+  "routes": [
+    {
+      "path": "/*",
+      "handler": "file",
+      "fallback": {
+        "name": "laravel",
+        "arguments": ["public/index.php"]
+      }
+    }
+  ]
+}
