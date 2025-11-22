@@ -55,12 +55,23 @@ RUN echo '#!/bin/bash\n\
 echo "Starting Laravel application..."\n\
 echo "Environment: ${APP_ENV:-local}"\n\
 echo "Database: ${DB_CONNECTION:-sqlite}"\n\
+echo "APP_URL: ${APP_URL:-not set}"\n\
 echo "Port: $PORT"\n\
+\n\
+# Show environment configuration\n\
+php artisan env || echo "Environment info not available"\n\
+\n\
+# Clear config cache\n\
+php artisan config:clear || echo "Config clear failed"\n\
 \n\
 # Run any pending migrations\n\
 php artisan migrate --force || echo "Migrations failed - check database configuration"\n\
 \n\
+# Cache configuration for better performance\n\
+php artisan config:cache || echo "Config cache failed"\n\
+\n\
 # Start the PHP development server\n\
+echo "Starting server on 0.0.0.0:$PORT"\n\
 exec php artisan serve --host=0.0.0.0 --port=$PORT\n\
 ' > start.sh && chmod +x start.sh
 
