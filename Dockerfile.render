@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+# Build script for Render deployment
+
+echo "Starting Render build process..."
+
+# Install PHP dependencies
+echo "Installing PHP dependencies..."
+composer install --no-dev --optimize-autoloader --no-interaction
+
+# Generate application key if not exists
+if [ -z "$APP_KEY" ]; then
+    echo "Generating application key..."
+    php artisan key:generate --force
+fi
+
+# Clear caches
+echo "Clearing caches..."
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan event:clear
+
+# Run migrations if needed (only in production)
+if [ "$APP_ENV" = "production" ]; then
+    echo "Running migrations..."
+    php artisan migrate --force
+fi
+
+# Build frontend assets if you have them
+echo "Building frontend assets..."
+npm install --production=false --ignore-scripts
+npm run build
+
+echo "Build process completed successfully!"

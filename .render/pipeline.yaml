@@ -1,0 +1,33 @@
+# Render Pipeline Configuration
+version: "1"
+services:
+  - name: cobacobaaja-app
+    type: web
+    env: php
+    region: singapore
+    buildCommand: |
+      set -ex
+      composer install --no-dev --optimize-autoloader --no-interaction
+      npm install --production=false --ignore-scripts
+      npm run build
+      php artisan key:generate --force
+      php artisan config:clear
+      php artisan route:clear
+      php artisan view:clear
+      php artisan migrate --force
+    startCommand: php -S 0.0.0.0:$PORT -t public/
+    envVars:
+      - key: APP_ENV
+        sync: false
+      - key: APP_DEBUG
+        sync: false
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        sync: false
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database

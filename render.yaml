@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: cobacobaaja-app
+    env: php
+    region: singapore
+    buildCommand: |
+      set -ex
+      # Install PHP dependencies
+      composer install --no-dev --optimize-autoloader --no-interaction
+      # Install Node.js dependencies and build assets
+      npm install --production=false --ignore-scripts
+      npm run build
+      # Generate application key
+      php artisan key:generate --force
+      # Clear caches
+      php artisan config:clear
+      php artisan route:clear
+      php artisan view:clear
+      # Run migrations
+      php artisan migrate --force
+    startCommand: |
+      # Start the Laravel application using PHP's built-in server with proper routing
+      php -S 0.0.0.0:$PORT server.php
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/database/database.sqlite
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: FILESYSTEM_DISK
+        value: local
+    healthCheckPath: /  # Basic health check

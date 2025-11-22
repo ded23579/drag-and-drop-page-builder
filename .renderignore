@@ -1,0 +1,50 @@
+# Files and directories to ignore during Render deployment
+
+# Git files
+.git/
+.gitignore
+.editorconfig
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Development files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Laravel specific
+vendor/
+composer.lock
+*.log
+.phpunit.result.cache
+
+# Environment specific
+.env.local
+.env.*.local
+.env.test
+
+# Tests
+tests/
+phpunit.xml
+
+# Backup files
+*.bak
+*.tmp
+*~
+
+# Other
+README.md
+RENDER_DEPLOYMENT.md
+render-deploy.sh
+render-build.sh
+render-start.sh
+Dockerfile.render
