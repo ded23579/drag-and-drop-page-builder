@@ -26,7 +26,10 @@ WORKDIR /var/www
 # Copy the entire application first
 COPY . .
 
-# Update composer.lock to match composer.json and install dependencies
+# Remove the existing composer.lock to force regeneration
+RUN rm -f composer.lock
+
+# Install dependencies fresh to generate proper lock file
 RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
 # Install and build frontend assets
