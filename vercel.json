@@ -3,12 +3,7 @@
   "builds": [
     {
       "src": "public/index.php",
-      "use": "@vercel/php",
-      "config": {
-        "composer": {
-          "version": "latest"
-        }
-      }
+      "use": "@vercel/php"
     }
   ],
   "routes": [
@@ -16,8 +11,5 @@
       "src": "/(.*)",
       "dest": "/public/index.php"
     }
-  ],
-  "buildCommand": "bash build.sh",
-  "installCommand": "composer install && npm install",
-  "outputDirectory": "."
+  ]
 }
