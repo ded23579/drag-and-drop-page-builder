@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Simple build script for Laravel app on Vercel
+# Build script for Laravel app on Railway
 
-echo "Starting build process on Vercel..."
+echo "Starting build process on Railway..."
 
 # Install PHP dependencies
 echo "Installing PHP dependencies..."
@@ -10,13 +10,14 @@ composer install --no-dev --optimize-autoloader --no-interaction --ignore-platfo
 
 # Generate application key if not present in environment
 if [ -z "$APP_KEY" ]; then
-    echo "Generating application key..."
-    php artisan key:generate --force
+    echo "Application key not set in environment, you'll need to set it in Railway dashboard"
 fi
 
 # Clear and cache configuration
 echo "Caching configuration..."
 php artisan config:clear
+
+# For production, cache config
 php artisan config:cache
 
 # Create necessary storage directories
@@ -29,5 +30,9 @@ chmod -R 777 storage
 # Build frontend assets
 echo "Building frontend assets..."
 npm run build
+
+# Run database migrations
+echo "Running database migrations..."
+php artisan migrate --force
 
 echo "Build process completed."
