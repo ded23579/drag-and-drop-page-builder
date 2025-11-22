@@ -4,6 +4,10 @@
 
 echo "Starting build process on Railway..."
 
+# Update composer.lock file first
+echo "Updating composer.lock to match composer.json..."
+composer update --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs || composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
+
 # Install PHP dependencies
 echo "Installing PHP dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
