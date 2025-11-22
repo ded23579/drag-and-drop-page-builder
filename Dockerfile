@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    nginx \
     nodejs \
     npm
 
@@ -35,17 +34,35 @@ RUN rm -f composer.lock
 RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
 # Install and build frontend assets
-RUN npm install
+RUN npm install --production
 RUN npm run build
 
-# Setup nginx
-RUN unlink /etc/nginx/sites-enabled/default
-COPY nginx.conf /etc/nginx/sites-available/
-RUN ln -s /etc/nginx/sites-available/nginx.conf /etc/nginx/sites-enabled/
-RUN mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx
+# Setup storage directory permissions
+RUN mkdir -p storage/logs
+RUN mkdir -p storage/framework/cache
+RUN mkdir -p storage/framework/sessions
+RUN mkdir -p storage/framework/views
+RUN chmod -R 777 storage
+
+# Generate application key if not set (this may fail if .env is incomplete)
+RUN php artisan key:generate --force || echo "Key generation skipped - set APP_KEY in environment variables"
 
 # Expose port
 EXPOSE 8000
 
+# Create startup script
+RUN echo '#!/bin/bash\n\
+echo "Starting Laravel application..."\n\
+echo "Environment: ${APP_ENV:-local}"\n\
+echo "Database: ${DB_CONNECTION:-sqlite}"\n\
+echo "Port: $PORT"\n\
+\n\
+# Run any pending migrations\n\
+php artisan migrate --force || echo "Migrations failed - check database configuration"\n\
+\n\
+# Start the PHP development server\n\
+exec php artisan serve --host=0.0.0.0 --port=$PORT\n\
+' > start.sh && chmod +x start.sh
+
 # Start the application
-CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"]
+CMD ["sh", "-c", "./start.sh"]
