@@ -33,8 +33,8 @@ RUN rm -f composer.lock
 # Install dependencies fresh to generate proper lock file
 RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
-# Install and build frontend assets
-RUN npm install --production
+# Install all frontend dependencies (including devDependencies) and build
+RUN npm install
 RUN npm run build
 
 # Setup storage directory permissions
