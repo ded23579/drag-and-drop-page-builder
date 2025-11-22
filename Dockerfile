@@ -18,6 +18,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
+# Install additional PHP extensions that Laravel might need
+RUN docker-php-ext-install opcache
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -37,15 +40,17 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-pl
 RUN npm install
 RUN npm run build
 
-# Setup storage directory permissions
+# Setup storage and bootstrap/cache directory permissions
 RUN mkdir -p storage/logs
 RUN mkdir -p storage/framework/cache
 RUN mkdir -p storage/framework/sessions
 RUN mkdir -p storage/framework/views
+RUN mkdir -p bootstrap/cache
 RUN chmod -R 777 storage
+RUN chmod -R 777 bootstrap/cache
 
-# Generate application key if not set (this may fail if .env is incomplete)
-RUN php artisan key:generate --force || echo "Key generation skipped - set APP_KEY in environment variables"
+# Create SQLite directory if needed
+RUN mkdir -p /tmp
 
 # Expose port
 EXPOSE 8000
@@ -58,21 +63,42 @@ echo "Database: ${DB_CONNECTION:-sqlite}"\n\
 echo "APP_URL: ${APP_URL:-not set}"\n\
 echo "Port: $PORT"\n\
 \n\
-# Show environment configuration\n\
-php artisan env || echo "Environment info not available"\n\
+# Create .env file from environment variables if it does not exist\n\
+if [ ! -f .env ]; then\n\
+  echo "APP_NAME=Laravel" > .env\n\
+  echo "APP_ENV=${APP_ENV:-production}" >> .env\n\
+  echo "APP_KEY=${APP_KEY:-base64:your-key-here}" >> .env\n\
+  echo "APP_DEBUG=${APP_DEBUG:-false}" >> .env\n\
+  echo "APP_URL=${APP_URL:-http://localhost}" >> .env\n\
+  echo "DB_CONNECTION=${DB_CONNECTION:-sqlite}" >> .env\n\
+  echo "DB_DATABASE=/tmp/database.sqlite" >> .env\n\
+  echo "LOG_CHANNEL=${LOG_CHANNEL:-stack}" >> .env\n\
+  echo "LOG_LEVEL=${LOG_LEVEL:-debug}" >> .env\n\
+  echo "SESSION_DRIVER=${SESSION_DRIVER:-file}" >> .env\n\
+  echo "QUEUE_CONNECTION=${QUEUE_CONNECTION:-sync}" >> .env\n\
+  echo "CACHE_STORE=${CACHE_STORE:-array}" >> .env\n\
+fi\n\
 \n\
-# Clear config cache\n\
-php artisan config:clear || echo "Config clear failed"\n\
+# Display .env contents for debugging (remove this in production after debugging)\n\
+echo "Current .env file:"\n\
+cat .env\n\
 \n\
-# Run any pending migrations\n\
-php artisan migrate --force || echo "Migrations failed - check database configuration"\n\
+# Make sure storage is linked\n\
+php artisan storage:link 2>/dev/null || echo "Storage link not needed"\n\
 \n\
-# Cache configuration for better performance\n\
-php artisan config:cache || echo "Config cache failed"\n\
+# Clear config and cache\n\
+php artisan config:clear\n\
+php artisan cache:clear\n\
+php artisan view:clear\n\
+php artisan route:clear\n\
+php artisan config:cache\n\
+\n\
+# Run migrations\n\
+php artisan migrate --force\n\
 \n\
 # Start the PHP development server\n\
 echo "Starting server on 0.0.0.0:$PORT"\n\
-exec php artisan serve --host=0.0.0.0 --port=$PORT\n\
+exec php artisan serve --host=0.0.0.0 --port=$PORT 2>&1\n\
 ' > start.sh && chmod +x start.sh
 
 # Start the application
