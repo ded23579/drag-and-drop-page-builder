@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "public/index.php",
-      "use": "@vercel/php"
+      "use": "@vercel/php",
+      "config": {
+        "runtime": "php-8.2"
+      }
     }
   ],
   "routes": [
@@ -11,5 +14,11 @@
       "src": "/(.*)",
       "dest": "/public/index.php"
     }
-  ]
+  ],
+  "functions": {
+    "public/index.php": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }
