@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# Install system dependencies
+# Install system dependencies including Node.js
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    nginx
+    nginx \
+    nodejs \
+    npm
 
 # Clear package cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
